@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ourspaceship.site - Exploring the Digital Universe</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            background-color: #000;
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .sci-fi-text {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .hud-border {
+            position: relative;
+        }
+
+        .hud-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border-top: 2px solid #00f3ff;
+            border-left: 2px solid #00f3ff;
+        }
+
+        .hud-border::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            border-bottom: 2px solid #00f3ff;
+            border-right: 2px solid #00f3ff;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .btn-sci-fi {
+            background: linear-gradient(45deg, transparent 5%, #00f3ff 5%);
+            color: #000;
+            box-shadow: 6px 0px 0px #00a8b0;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sci-fi:hover {
+            box-shadow: 0px 0px 15px #00f3ff;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- 3D Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 left-0 border-b border-white/10 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 border-2 border-[#00f3ff] rounded-full flex items-center justify-center animate-pulse">
+                        <div class="w-2 h-2 bg-[#00f3ff] rounded-full"></div>
+                    </div>
+                    <span class="sci-fi-text text-xl font-bold tracking-wider text-white">OUR<span
+                            class="text-[#00f3ff]">SPACESHIP</span>.SITE</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8 sci-fi-text text-sm">
+                        <a href="#"
+                            class="text-[#00f3ff] px-3 py-2 rounded-md font-medium hover:bg-white/10 transition">BRIDGE</a>
+                        <a href="#mission"
+                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">MISSION</a>
+                        <a href="#systems"
+                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">SYSTEMS</a>
+                        <a href="#crew"
+                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">CREW</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <!-- Mobile menu button placeholder -->
+                    <button class="text-gray-300 hover:text-white p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="relative z-10 pt-32 pb-16 sm:pt-48 sm:pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block mb-4 px-4 py-1 border border-[#00f3ff]/30 rounded-full bg-[#00f3ff]/10">
+                <span class="sci-fi-text text-[#00f3ff] text-xs tracking-[0.2em] uppercase">System Status: Online</span>
+            </div>
+
+            <h1 class="sci-fi-text text-5xl sm:text-7xl font-black text-white mb-6 tracking-tight glow-text">
+                VOYAGE INTO <br />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-purple-500">THE
+                    UNKNOWN</span>
+            </h1>
+
+            <p class="mt-4 text-xl text-gray-300 max-w-2xl mx-auto font-light">
+                Welcome to <span class="text-white font-bold">ourspaceship.site</span>. <br class="hidden sm:block">
+                We are charting a course through the digital galaxy, building the technology of tomorrow.
+            </p>
+            <p class="mt-2 text-lg text-[#00f3ff] font-medium Burmese-text">
+                ကျွန်ုပ်တို့၏ အာကာသယာဉ်မှ ကြိုဆိုပါသည်။
+            </p>
+
+            <div class="mt-10 flex justify-center gap-6">
+                <button class="btn-sci-fi px-8 py-4 font-bold uppercase tracking-widest text-sm"
+                    onclick="scrollToMission()">
+                    Initialize Launch
+                </button>
+                <button
+                    class="px-8 py-4 border border-white/30 hover:border-[#00f3ff] hover:text-[#00f3ff] hover:bg-white/5 transition duration-300 uppercase tracking-widest text-sm font-bold sci-fi-text">
+                    View Flight Log
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Stat 1 -->
+                <div class="glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="sci-fi-text text-[#00f3ff] text-lg">VELOCITY</h3>
+                        <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-4xl font-bold mb-1">28,000 <span
+                            class="text-sm font-normal text-gray-400">km/h</span></div>
+                    <div class="w-full bg-gray-700 h-1 mt-2">
+                        <div class="bg-[#00f3ff] h-1 w-[75%] group-hover:w-[90%] transition-all duration-1000"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 2 -->
+                <div class="glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="sci-fi-text text-[#00f3ff] text-lg">CREW</h3>
+                        <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="text-4xl font-bold mb-1">ACTIVE</div>
+                    <div class="text-sm text-gray-400">Systems Nominal</div>
+                </div>
+
+                <!-- Stat 3 -->
+                <div class="glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="sci-fi-text text-[#00f3ff] text-lg">DISTANCE</h3>
+                        <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="text-4xl font-bold mb-1">∞</div>
+                    <div class="text-sm text-gray-400">Light Years Remaining</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Section 2 -->
+    <section id="mission" class="relative z-10 py-24 bg-black/50 backdrop-blur-sm border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="w-full md:w-1/2">
+                    <h2 class="sci-fi-text text-3xl font-bold text-white mb-6">THE <span
+                            class="text-[#00f3ff]">KMT</span> PROTOCOL</h2>
+                    <p class="text-gray-300 mb-6 leading-relaxed">
+                        Our Spaceship is more than just a vessel; it is a community driven by innovation. We explore new
+                        technologies, design futuristic interfaces, and build the infrastructure for the next generation
+                        of the web.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center text-gray-300">
+                            <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3"></span>
+                            Advanced Web Development
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3"></span>
+                            AI Integration
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3"></span>
+                            Next-Gen User Interfaces
+                        </li>
+                    </ul>
+                </div>
+                <div
+                    class="w-full md:w-1/2 h-64 md:h-80 relative glass-panel rounded-xl overflow-hidden flex items-center justify-center">
+                    <div
+                        class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-50">
+                    </div>
+                    <div class="relative z-10 text-center">
+                        <div class="sci-fi-text text-6xl font-black text-white/20">KMT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="relative z-10 border-t border-white/10 bg-black py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-gray-500 mb-4 md:mb-0">
+                &copy; 2025 OurSpaceship.site. All systems operational.
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-400 hover:text-[#00f3ff] transition">Comms</a>
+                <a href="#" class="text-gray-400 hover:text-[#00f3ff] transition">Telemetry</a>
+                <a href="#" class="text-gray-400 hover:text-[#00f3ff] transition">Login</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        function scrollToMission() {
+            document.getElementById('mission').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- THREE.JS BACKGROUND SCENE ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            // Fog to fade out distant stars
+            scene.fog = new THREE.FogExp2(0x000000, 0.0008);
+
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 100; // Moving camera back slightly
+
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // --- CREATE STARS ---
+            const starGeometry = new THREE.BufferGeometry();
+            const starCount = 6000;
+            const posArray = new Float32Array(starCount * 3);
+            const colorsArray = new Float32Array(starCount * 3);
+
+            for (let i = 0; i < starCount * 3; i += 3) {
+                // Random positions scattered in a sphere-like volume
+                posArray[i] = (Math.random() - 0.5) * 2000; // x
+                posArray[i + 1] = (Math.random() - 0.5) * 2000; // y
+                posArray[i + 2] = (Math.random() - 0.5) * 2000; // z
+
+                // Random colors (white, blueish, reddish)
+                const colorType = Math.random();
+                if (colorType > 0.8) {
+                    // Blue-ish
+                    colorsArray[i] = 0.5;
+                    colorsArray[i + 1] = 0.8;
+                    colorsArray[i + 2] = 1;
+                } else if (colorType > 0.6) {
+                    // Red-ish
+                    colorsArray[i] = 1;
+                    colorsArray[i + 1] = 0.6;
+                    colorsArray[i + 2] = 0.6;
+                } else {
+                    // White
+                    colorsArray[i] = 1;
+                    colorsArray[i + 1] = 1;
+                    colorsArray[i + 2] = 1;
+                }
+            }
+
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            starGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+            const starMaterial = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+
+            // --- ANIMATION LOOP ---
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+
+            // Handle mouse movement for parallax effect
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+                mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
+            });
+
+            // Handle touch for parallax effect
+            document.addEventListener('touchmove', (event) => {
+                if (event.touches.length > 0) {
+                    mouseX = (event.touches[0].clientX - window.innerWidth / 2) * 0.002;
+                    mouseY = (event.touches[0].clientY - window.innerHeight / 2) * 0.002;
+                }
+            });
+
+            const clock = new THREE.Clock();
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                const elapsedTime = clock.getElapsedTime();
+
+                // Rotate entire starfield slowly
+                stars.rotation.y += 0.0005;
+                stars.rotation.x += 0.0002;
+
+                // Fly through effect (optional - subtle movement forward)
+                // We just rotate for a "drift" feel to keep it nause-free for reading text
+
+                // Smooth camera movement based on mouse
+                targetX = mouseX * 50;
+                targetY = mouseY * 50;
+
+                camera.position.x += (targetX - camera.position.x) * 0.05;
+                camera.position.y += (-targetY - camera.position.y) * 0.05;
+
+                // Always look at center
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initThreeJS);
+
+    </script>
+</body>
+
+</html>
