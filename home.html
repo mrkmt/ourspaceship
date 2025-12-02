@@ -9,9 +9,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600&display=swap"
@@ -24,6 +21,25 @@
             background-color: #000;
             font-family: 'Rajdhani', sans-serif;
             color: white;
+            cursor: crosshair;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00a8b0;
         }
 
         #canvas-container {
@@ -38,8 +54,9 @@
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            /* FIX: Reordered prefixes as requested by linter */
             -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
@@ -83,47 +100,372 @@
             color: #000;
             box-shadow: 6px 0px 0px #00a8b0;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-sci-fi::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-sci-fi:hover::before {
+            left: 100%;
         }
 
         .btn-sci-fi:hover {
-            box-shadow: 0px 0px 15px #00f3ff;
+            box-shadow: 0px 0px 20px #00f3ff;
             transform: translateY(-2px);
+            color: white;
+            text-shadow: 0 0 5px #00f3ff;
+        }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top: 4px solid #00f3ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-ring::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top: 4px solid #bf00ff;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- SCROLL REVEAL --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- TIMELINE SPECIFIC STYLES --- */
+        .timeline-container {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, #00f3ff, #bf00ff, transparent);
+            box-shadow: 0 0 15px #00f3ff;
+            z-index: 0;
+        }
+
+        .timeline-event {
+            position: relative;
+            margin-bottom: 4rem;
+            display: flex;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .timeline-event.left {
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+
+        .timeline-event.right {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+        }
+
+        .event-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #000;
+            border: 2px solid #00f3ff;
+            box-shadow: 0 0 10px #00f3ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .event-marker:hover,
+        .event-marker.active {
+            transform: translateX(-50%) scale(1.5);
+            background: #00f3ff;
+            box-shadow: 0 0 25px #00f3ff;
+        }
+
+        .event-content {
+            width: 45%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .event-content:hover {
+            transform: scale(1.02);
+        }
+
+        .event-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border-top: 2px solid #00f3ff;
+            border-left: 2px solid #00f3ff;
+        }
+
+        .event-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .tag-launch {
+            background: rgba(0, 243, 255, 0.2);
+            color: #00f3ff;
+            border: 1px solid #00f3ff;
+        }
+
+        .tag-exploration {
+            background: rgba(191, 0, 255, 0.2);
+            color: #bf00ff;
+            border: 1px solid #bf00ff;
+        }
+
+        .tag-colony {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid #ffa500;
+        }
+
+        .event-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, margin-top 0.5s ease;
+        }
+
+        .event-details.expanded {
+            max-height: 500px;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .page-section.active {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 2rem;
+            }
+
+            .event-marker {
+                left: 2rem;
+            }
+
+            .timeline-event.left,
+            .timeline-event.right {
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+
+            .event-content {
+                width: calc(100% - 5rem);
+            }
         }
     </style>
 </head>
 
 <body class="antialiased">
 
-    <!-- 3D Background -->
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="text-center">
+            <div class="loader-ring mx-auto mb-6"></div>
+            <div class="sci-fi-text text-xl font-bold tracking-[0.3em] text-white animate-pulse">
+                INITIALIZING <span class="text-[#00f3ff]">SYSTEMS</span>
+            </div>
+            <div class="mt-2 text-xs text-gray-500 font-mono" id="loader-text">Loading Assets...</div>
+        </div>
+    </div>
+
+    <!-- JOIN MODAL -->
+    <div id="join-modal"
+        class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md mx-4 p-8 rounded-xl border border-[#00f3ff]/50 relative transform scale-95 transition-transform duration-300"
+            id="modal-content">
+            <!-- FIX: Added aria-label for accessibility -->
+            <button onclick="toggleModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"
+                aria-label="Close modal">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <h2 class="sci-fi-text text-2xl font-bold text-white mb-2 text-center">JOIN THE <span
+                    class="text-[#00f3ff]">CREW</span></h2>
+            <p class="text-gray-400 text-center text-sm mb-6">Secure transmission channel open.</p>
+
+            <form class="space-y-4"
+                onsubmit="event.preventDefault(); toggleModal(); alert('Transmission Received. Stand by for contact.');">
+                <div>
+                    <!-- FIX: Added 'for' attribute to labels and 'id' to inputs -->
+                    <label for="codename"
+                        class="block text-[#00f3ff] text-xs font-bold uppercase tracking-wider mb-1">Codename</label>
+                    <input id="codename" type="text"
+                        class="w-full bg-black/50 border border-gray-700 rounded p-3 text-white focus:border-[#00f3ff] focus:outline-none transition-colors"
+                        placeholder="Enter your name">
+                </div>
+                <div>
+                    <label for="comm-id"
+                        class="block text-[#00f3ff] text-xs font-bold uppercase tracking-wider mb-1">Communication
+                        ID</label>
+                    <input id="comm-id" type="email"
+                        class="w-full bg-black/50 border border-gray-700 rounded p-3 text-white focus:border-[#00f3ff] focus:outline-none transition-colors"
+                        placeholder="Enter email">
+                </div>
+                <div>
+                    <!-- FIX: Added 'for' and 'id' to fix Select accessibility error -->
+                    <label for="expertise"
+                        class="block text-[#00f3ff] text-xs font-bold uppercase tracking-wider mb-1">Expertise</label>
+                    <select id="expertise"
+                        class="w-full bg-black/50 border border-gray-700 rounded p-3 text-white focus:border-[#00f3ff] focus:outline-none transition-colors">
+                        <option>Engineering</option>
+                        <option>Navigation</option>
+                        <option>Science</option>
+                        <option>Diplomacy</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full btn-sci-fi py-3 font-bold uppercase tracking-widest mt-2">
+                    Transmit Data
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3D Background (Persistent across pages) -->
     <div id="canvas-container"></div>
 
     <!-- Navigation -->
     <nav class="fixed w-full z-50 top-0 left-0 border-b border-white/10 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <div class="flex-shrink-0 flex items-center space-x-2">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center space-x-2 cursor-pointer group"
+                    onclick="switchPage('home')">
                     <div
-                        class="w-8 h-8 border-2 border-[#00f3ff] rounded-full flex items-center justify-center animate-pulse">
-                        <div class="w-2 h-2 bg-[#00f3ff] rounded-full"></div>
+                        class="w-8 h-8 border-2 border-[#00f3ff] rounded-full flex items-center justify-center group-hover:animate-spin transition-all">
+                        <div class="w-2 h-2 bg-[#00f3ff] rounded-full shadow-[0_0_10px_#00f3ff]"></div>
                     </div>
-                    <span class="sci-fi-text text-xl font-bold tracking-wider text-white">OUR<span
-                            class="text-[#00f3ff]">SPACESHIP</span>.SITE</span>
+                    <span
+                        class="sci-fi-text text-xl font-bold tracking-wider text-white group-hover:text-[#00f3ff] transition-colors">OUR<span
+                            class="text-[#00f3ff] group-hover:text-white transition-colors">SPACESHIP</span>.SITE</span>
                 </div>
+
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8 sci-fi-text text-sm">
-                        <a href="#"
-                            class="text-[#00f3ff] px-3 py-2 rounded-md font-medium hover:bg-white/10 transition">BRIDGE</a>
-                        <a href="#mission"
-                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">MISSION</a>
-                        <a href="#systems"
-                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">SYSTEMS</a>
-                        <a href="#crew"
-                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">CREW</a>
+                        <button onclick="switchPage('home')" id="nav-home"
+                            class="text-[#00f3ff] px-3 py-2 rounded-md font-medium hover:bg-white/10 transition">BRIDGE</button>
+                        <button onclick="switchPage('timeline')" id="nav-timeline"
+                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">TIMELINE</button>
+                        <button onclick="scrollToSection('mission')"
+                            class="text-gray-300 hover:text-[#00f3ff] px-3 py-2 rounded-md font-medium transition">MISSION</button>
+                        <button onclick="toggleModal()"
+                            class="border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black px-4 py-2 rounded-md font-medium transition duration-300 shadow-[0_0_10px_rgba(0,243,255,0.2)]">JOIN
+                            CREW</button>
                     </div>
                 </div>
+
                 <div class="md:hidden">
-                    <!-- Mobile menu button placeholder -->
-                    <button class="text-gray-300 hover:text-white p-2">
+                    <!-- FIX: Added aria-label for accessibility -->
+                    <button class="text-gray-300 hover:text-white p-2" onclick="toggleMobileMenu()"
+                        aria-label="Open mobile menu">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -132,130 +474,172 @@
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-white/10">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 sci-fi-text">
+                <button onclick="switchPage('home')"
+                    class="text-gray-300 hover:text-[#00f3ff] block px-3 py-2 rounded-md text-base font-medium w-full text-left">BRIDGE</button>
+                <button onclick="switchPage('timeline')"
+                    class="text-gray-300 hover:text-[#00f3ff] block px-3 py-2 rounded-md text-base font-medium w-full text-left">TIMELINE</button>
+                <button onclick="toggleModal()"
+                    class="text-[#00f3ff] block px-3 py-2 rounded-md text-base font-medium w-full text-left font-bold">JOIN
+                    CREW</button>
+            </div>
+        </div>
     </nav>
 
-    <!-- Hero Section -->
-    <main class="relative z-10 pt-32 pb-16 sm:pt-48 sm:pb-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="inline-block mb-4 px-4 py-1 border border-[#00f3ff]/30 rounded-full bg-[#00f3ff]/10">
-                <span class="sci-fi-text text-[#00f3ff] text-xs tracking-[0.2em] uppercase">System Status: Online</span>
-            </div>
-
-            <h1 class="sci-fi-text text-5xl sm:text-7xl font-black text-white mb-6 tracking-tight glow-text">
-                VOYAGE INTO <br />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-purple-500">THE
-                    UNKNOWN</span>
-            </h1>
-
-            <p class="mt-4 text-xl text-gray-300 max-w-2xl mx-auto font-light">
-                Welcome to <span class="text-white font-bold">ourspaceship.site</span>. <br class="hidden sm:block">
-                We are charting a course through the digital galaxy, building the technology of tomorrow.
-            </p>
-            <p class="mt-2 text-lg text-[#00f3ff] font-medium Burmese-text">
-                ကျွန်ုပ်တို့၏ အာကာသယာဉ်မှ ကြိုဆိုပါသည်။
-            </p>
-
-            <div class="mt-10 flex justify-center gap-6">
-                <button class="btn-sci-fi px-8 py-4 font-bold uppercase tracking-widest text-sm"
-                    onclick="scrollToMission()">
-                    Initialize Launch
-                </button>
-                <button
-                    class="px-8 py-4 border border-white/30 hover:border-[#00f3ff] hover:text-[#00f3ff] hover:bg-white/5 transition duration-300 uppercase tracking-widest text-sm font-bold sci-fi-text">
-                    View Flight Log
-                </button>
-            </div>
-        </div>
-
-        <!-- Dashboard Stats -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Stat 1 -->
-                <div class="glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="sci-fi-text text-[#00f3ff] text-lg">VELOCITY</h3>
-                        <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <div class="text-4xl font-bold mb-1">28,000 <span
-                            class="text-sm font-normal text-gray-400">km/h</span></div>
-                    <div class="w-full bg-gray-700 h-1 mt-2">
-                        <div class="bg-[#00f3ff] h-1 w-[75%] group-hover:w-[90%] transition-all duration-1000"></div>
-                    </div>
+    <!-- PAGE 1: HOME -->
+    <div id="page-home" class="page-section active">
+        <!-- Hero Section -->
+        <main class="relative z-10 pt-32 pb-16 sm:pt-48 sm:pb-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="reveal inline-block mb-4 px-4 py-1 border border-[#00f3ff]/30 rounded-full bg-[#00f3ff]/10">
+                    <span class="sci-fi-text text-[#00f3ff] text-xs tracking-[0.2em] uppercase">System Status:
+                        Online</span>
                 </div>
 
-                <!-- Stat 2 -->
-                <div class="glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="sci-fi-text text-[#00f3ff] text-lg">CREW</h3>
-                        <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
-                    </div>
-                    <div class="text-4xl font-bold mb-1">ACTIVE</div>
-                    <div class="text-sm text-gray-400">Systems Nominal</div>
-                </div>
+                <h1 class="reveal sci-fi-text text-5xl sm:text-7xl font-black text-white mb-6 tracking-tight glow-text">
+                    VOYAGE INTO <br />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-purple-500">THE
+                        UNKNOWN</span>
+                </h1>
 
-                <!-- Stat 3 -->
-                <div class="glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="sci-fi-text text-[#00f3ff] text-lg">DISTANCE</h3>
-                        <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                            </path>
-                        </svg>
-                    </div>
-                    <div class="text-4xl font-bold mb-1">∞</div>
-                    <div class="text-sm text-gray-400">Light Years Remaining</div>
+                <p class="reveal mt-4 text-xl text-gray-300 max-w-2xl mx-auto font-light">
+                    Welcome to <span class="text-white font-bold">ourspaceship.site</span>. <br class="hidden sm:block">
+                    We are charting a course through the digital galaxy, building the technology of tomorrow.
+                </p>
+                <p class="reveal mt-2 text-lg text-[#00f3ff] font-medium Burmese-text">
+                    ကျွန်ုပ်တို့၏ အာကာသယာဉ်မှ ကြိုဆိုပါသည်။
+                </p>
+
+                <div class="reveal mt-10 flex justify-center gap-6">
+                    <button class="btn-sci-fi px-8 py-4 font-bold uppercase tracking-widest text-sm"
+                        onclick="toggleModal()">
+                        Initialize Launch
+                    </button>
+                    <button
+                        class="px-8 py-4 border border-white/30 hover:border-[#00f3ff] hover:text-[#00f3ff] hover:bg-white/5 transition duration-300 uppercase tracking-widest text-sm font-bold sci-fi-text"
+                        onclick="switchPage('timeline')">
+                        View Flight Log
+                    </button>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Section 2 -->
-    <section id="mission" class="relative z-10 py-24 bg-black/50 backdrop-blur-sm border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row gap-12 items-center">
-                <div class="w-full md:w-1/2">
-                    <h2 class="sci-fi-text text-3xl font-bold text-white mb-6">THE <span
-                            class="text-[#00f3ff]">KMT</span> PROTOCOL</h2>
-                    <p class="text-gray-300 mb-6 leading-relaxed">
-                        Our Spaceship is more than just a vessel; it is a community driven by innovation. We explore new
-                        technologies, design futuristic interfaces, and build the infrastructure for the next generation
-                        of the web.
-                    </p>
-                    <ul class="space-y-4">
-                        <li class="flex items-center text-gray-300">
-                            <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3"></span>
-                            Advanced Web Development
-                        </li>
-                        <li class="flex items-center text-gray-300">
-                            <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3"></span>
-                            AI Integration
-                        </li>
-                        <li class="flex items-center text-gray-300">
-                            <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3"></span>
-                            Next-Gen User Interfaces
-                        </li>
-                    </ul>
-                </div>
-                <div
-                    class="w-full md:w-1/2 h-64 md:h-80 relative glass-panel rounded-xl overflow-hidden flex items-center justify-center">
+            <!-- Dashboard Stats -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div
-                        class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-50">
+                        class="reveal glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="sci-fi-text text-[#00f3ff] text-lg">VELOCITY</h3>
+                            <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-4xl font-bold mb-1">28,000 <span
+                                class="text-sm font-normal text-gray-400">km/h</span></div>
+                        <div class="w-full bg-gray-700 h-1 mt-2">
+                            <div class="bg-[#00f3ff] h-1 w-[75%] group-hover:w-[90%] transition-all duration-1000">
+                            </div>
+                        </div>
                     </div>
-                    <div class="relative z-10 text-center">
-                        <div class="sci-fi-text text-6xl font-black text-white/20">KMT</div>
+
+                    <div
+                        class="reveal glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="sci-fi-text text-[#00f3ff] text-lg">CREW</h3>
+                            <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="text-4xl font-bold mb-1">ACTIVE</div>
+                        <div class="text-sm text-gray-400">Systems Nominal</div>
+                    </div>
+
+                    <div
+                        class="reveal glass-panel p-6 rounded-lg hud-border group hover:bg-white/10 transition duration-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="sci-fi-text text-[#00f3ff] text-lg">DISTANCE</h3>
+                            <svg class="w-6 h-6 text-[#00f3ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="text-4xl font-bold mb-1">∞</div>
+                        <div class="text-sm text-gray-400">Light Years Remaining</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </main>
+
+        <!-- Mission Section -->
+        <section id="mission" class="relative z-10 py-24 bg-black/50 backdrop-blur-sm border-t border-white/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row gap-12 items-center">
+                    <div class="w-full md:w-1/2">
+                        <h2 class="reveal sci-fi-text text-3xl font-bold text-white mb-6">THE <span
+                                class="text-[#00f3ff]">KMT</span> PROTOCOL</h2>
+                        <p class="reveal text-gray-300 mb-6 leading-relaxed">
+                            Our Spaceship is more than just a vessel; it is a community driven by innovation. We explore
+                            new technologies, design futuristic interfaces, and build the infrastructure for the next
+                            generation of the web.
+                        </p>
+                        <ul class="reveal space-y-4">
+                            <li class="flex items-center text-gray-300">
+                                <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3 shadow-[0_0_5px_#00f3ff]"></span>
+                                Advanced Web Development
+                            </li>
+                            <li class="flex items-center text-gray-300">
+                                <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3 shadow-[0_0_5px_#00f3ff]"></span>
+                                AI Integration
+                            </li>
+                            <li class="flex items-center text-gray-300">
+                                <span class="w-2 h-2 bg-[#00f3ff] rounded-full mr-3 shadow-[0_0_5px_#00f3ff]"></span>
+                                Next-Gen User Interfaces
+                            </li>
+                        </ul>
+                    </div>
+                    <div
+                        class="reveal w-full md:w-1/2 h-64 md:h-80 relative glass-panel rounded-xl overflow-hidden flex items-center justify-center">
+                        <div
+                            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-50 transition duration-700 hover:scale-110 hover:opacity-70">
+                        </div>
+                        <div class="relative z-10 text-center">
+                            <div class="sci-fi-text text-6xl font-black text-white/20">KMT</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PAGE 2: TIMELINE (Hidden by default) -->
+    <div id="page-timeline" class="page-section">
+        <main class="relative z-10 pt-32 pb-16 text-center">
+            <h1 class="sci-fi-text text-4xl sm:text-6xl font-black text-white mb-4 glow-text">
+                MISSION <span class="text-[#00f3ff]">TIMELINE</span>
+            </h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                Charting the history and future of the KMT Space Program.
+                <br>
+                <span class="text-[#00f3ff]">ကမ္ဘာမြေမှ ကြယ်များဆီသို့ ခရီးစဉ်မှတ်တမ်း</span>
+            </p>
+        </main>
+
+        <section class="relative z-10 pb-24 px-4">
+            <div class="max-w-6xl mx-auto timeline-container">
+                <div class="timeline-line"></div>
+                <div id="timeline-events">
+                    <!-- Events will be injected via JS -->
+                </div>
+            </div>
+        </section>
+    </div>
 
     <footer class="relative z-10 border-t border-white/10 bg-black py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
@@ -265,19 +649,265 @@
             <div class="flex space-x-6">
                 <a href="#" class="text-gray-400 hover:text-[#00f3ff] transition">Comms</a>
                 <a href="#" class="text-gray-400 hover:text-[#00f3ff] transition">Telemetry</a>
-                <a href="#" class="text-gray-400 hover:text-[#00f3ff] transition">Login</a>
+                <a href="#" onclick="toggleModal()" class="text-gray-400 hover:text-[#00f3ff] transition">Login</a>
             </div>
         </div>
     </footer>
 
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script>
-        // Smooth scroll
-        function scrollToMission() {
-            document.getElementById('mission').scrollIntoView({ behavior: 'smooth' });
+        // --- LOADING SCREEN LOGIC ---
+        // Changed to 'load' event to wait for images and scripts (like Three.js)
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('preloader');
+            const loaderText = document.getElementById('loader-text');
+
+            // Initialize 3D Background here to ensure THREE is loaded
+            initThreeJS();
+
+            setTimeout(() => {
+                loaderText.textContent = "Systems Online.";
+                loaderText.classList.add('text-[#00f3ff]');
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    loader.style.visibility = 'hidden';
+                    // Trigger initial scroll reveals
+                    handleScrollReveal();
+                }, 500);
+            }, 1000); // Fake load time for effect
+        });
+
+        // --- SCROLL REVEAL OBSERVER ---
+        function handleScrollReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target); // Reveal only once
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            reveals.forEach(element => {
+                observer.observe(element);
+            });
+        }
+
+        // Re-run observer when switching pages
+        function refreshObservers() {
+            setTimeout(handleScrollReveal, 100);
+        }
+
+        // --- MODAL LOGIC ---
+        function toggleModal() {
+            const modal = document.getElementById('join-modal');
+            const content = document.getElementById('modal-content');
+
+            if (modal.classList.contains('hidden')) {
+                // Open
+                modal.classList.remove('hidden');
+                // Trigger reflow
+                void modal.offsetWidth;
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            } else {
+                // Close
+                modal.classList.add('opacity-0');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+                setTimeout(() => {
+                    if (!section.classList.contains('active')) section.style.display = 'none';
+                }, 500);
+            });
+
+            // Update Nav Active State
+            const homeBtn = document.getElementById('nav-home');
+            const timeBtn = document.getElementById('nav-timeline');
+
+            if (pageId === 'home') {
+                document.getElementById('page-home').style.display = 'block';
+                // Trigger reflow
+                void document.getElementById('page-home').offsetWidth;
+                document.getElementById('page-home').classList.add('active');
+
+                homeBtn.classList.add('text-[#00f3ff]');
+                homeBtn.classList.remove('text-gray-300');
+                timeBtn.classList.add('text-gray-300');
+                timeBtn.classList.remove('text-[#00f3ff]');
+            } else {
+                document.getElementById('page-timeline').style.display = 'block';
+                void document.getElementById('page-timeline').offsetWidth;
+                document.getElementById('page-timeline').classList.add('active');
+
+                timeBtn.classList.add('text-[#00f3ff]');
+                timeBtn.classList.remove('text-gray-300');
+                homeBtn.classList.add('text-gray-300');
+                homeBtn.classList.remove('text-[#00f3ff]');
+            }
+
+            // Close mobile menu if open
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+
+            window.scrollTo(0, 0);
+            refreshObservers();
+        }
+
+        function scrollToSection(sectionId) {
+            if (!document.getElementById('page-home').classList.contains('active')) {
+                switchPage('home');
+                setTimeout(() => {
+                    const el = document.getElementById(sectionId);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            } else {
+                const el = document.getElementById(sectionId);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- TIMELINE DATA & RENDER ---
+        const spaceEvents = [
+            {
+                id: 1,
+                tagType: "launch",
+                tagName: "Phase I: Genesis",
+                date: "2024",
+                title: "System Initialization",
+                preview: "The KMT Protocol is established. Core systems online.",
+                description: "The founding of the KMT Space Initiative. A team of visionary engineers gathered to build the digital infrastructure required for deep space exploration. The first line of code was written.",
+                significance: "Marked the transition from dream to reality."
+            },
+            {
+                id: 2,
+                tagType: "launch",
+                tagName: "Phase I: Genesis",
+                date: "2025",
+                title: "First Orbit Achieved",
+                preview: "Deployment of the 'Navigator' satellite network.",
+                description: "Our Spaceship successfully launched its first constellation of communication satellites. These ensure high-speed data transfer between Earth ground stations and orbital assets.",
+                significance: "Established a permanent foothold in Low Earth Orbit (LEO)."
+            },
+            {
+                id: 3,
+                tagType: "exploration",
+                tagName: "Phase II: Expansion",
+                date: "2028",
+                title: "Lunar Gateway",
+                preview: "Construction begins on the Moon orbiting station.",
+                description: "Serving as a solar-powered communications hub, science laboratory, and short-term habitation module. It is the essential stepping stone for deep space missions.",
+                significance: "First permanent human presence beyond Earth's orbit."
+            },
+            {
+                id: 4,
+                tagType: "colony",
+                tagName: "Phase III: Settlement",
+                date: "2035",
+                title: "Red Horizon",
+                preview: "First human footprint on Mars.",
+                description: "The KMT 'Vanguard' mission touches down in the Jezero Crater. The crew begins the construction of the first semi-permanent habitation dome, utilizing local resources.",
+                significance: "Humanity officially becomes a multi-planetary species."
+            },
+            {
+                id: 5,
+                tagType: "exploration",
+                tagName: "Phase IV: Interstellar",
+                date: "2050",
+                title: "The Great Leap",
+                preview: "Launch of the first deep-space probe to Alpha Centauri.",
+                description: "Using experimental propulsion technology, the probe 'Voyager K' begins its centuries-long journey to the nearest star system, carrying the digital heritage of humanity.",
+                significance: "The beginning of our journey into the infinite."
+            }
+        ];
+
+        // Render Timeline
+        const container = document.getElementById('timeline-events');
+        let activeEventId = null;
+
+        spaceEvents.forEach((event, index) => {
+            const isLeft = index % 2 === 0;
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `timeline-event ${isLeft ? 'left' : 'right'} reveal`; // Added reveal class
+
+            eventDiv.innerHTML = `
+                <div class="event-marker" onclick="toggleEvent(${event.id})" data-id="${event.id}"></div>
+                <div class="event-content" onclick="toggleEvent(${event.id})">
+                    <div class="glass-panel event-card">
+                        <span class="event-tag tag-${event.tagType}">${event.tagName}</span>
+                        <div class="event-date sci-fi-text">${event.date}</div>
+                        <h3 class="event-title sci-fi-text">${event.title}</h3>
+                        <p class="event-preview text-gray-400 text-sm">${event.preview}</p>
+                        <div class="event-details" id="details-${event.id}">
+                            <p class="text-gray-300 mt-2 text-sm leading-relaxed">${event.description}</p>
+                            <div class="mt-4 p-3 bg-[#00f3ff]/10 border-l-2 border-[#00f3ff] rounded-r">
+                                <div class="text-[#00f3ff] text-xs uppercase font-bold mb-1">Significance</div>
+                                <p class="text-xs text-gray-400">${event.significance}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(eventDiv);
+        });
+
+        window.toggleEvent = function (eventId) {
+            const details = document.getElementById(`details-${eventId}`);
+            const marker = document.querySelector(`.event-marker[data-id="${eventId}"]`);
+
+            if (activeEventId === eventId) {
+                // Close current
+                details.classList.remove('expanded');
+                marker.classList.remove('active');
+                activeEventId = null;
+            } else {
+                // Close previous if exists
+                if (activeEventId !== null) {
+                    const prevDetails = document.getElementById(`details-${activeEventId}`);
+                    const prevMarker = document.querySelector(`.event-marker[data-id="${activeEventId}"]`);
+                    if (prevDetails) prevDetails.classList.remove('expanded');
+                    if (prevMarker) prevMarker.classList.remove('active');
+                }
+
+                // Open new
+                details.classList.add('expanded');
+                marker.classList.add('active');
+                activeEventId = eventId;
+            }
         }
 
         // --- THREE.JS BACKGROUND SCENE ---
         const initThreeJS = () => {
+            // Safety check in case THREE is still not loaded
+            if (typeof THREE === 'undefined') {
+                console.error("Three.js not loaded.");
+                return;
+            }
+
             const container = document.getElementById('canvas-container');
 
             // Scene setup
@@ -398,8 +1028,7 @@
             });
         };
 
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', initThreeJS);
+        // Initialize called inside window.load above
 
     </script>
 </body>
